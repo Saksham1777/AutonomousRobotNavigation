@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+  <param name="robot_description" textfile="$(find mobile_manipulator_body)/urdf/robot_base_wheel_control_speed_steer_path_follower_lidar.urdf" />
+  <include file="$(find gazebo_ros)/launch/empty_world.launch"/>
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model robot_base" />
+  <rosparam command="load" file="$(find mobile_manipulator_body)/config/control_wheel_control_speed_steer_path_follower.yaml" />
+
+  <!-- Spawn individual wheel controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" 
+        args="joint_state_controller front_left_wheel_steering_controller front_right_wheel_steering_controller rear_left_wheel_controller rear_right_wheel_controller"/>
+
+  <!-- Spawn overall controllers -->
+  <!--node name="base_controller_spawner" pkg="controller_manager" type="spawner" args="robot_base_joint_publisher robot_base_velocity_controller"/-->
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  
+  <!-- Visualize -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mobile_manipulator_body)/rviz/control_wheel_control_speed_steer_path_follower_config.rviz" />
+  <node name="rqt1" pkg="rqt_gui" type="rqt_gui" args="--perspective-file $(find mobile_manipulator_body)/rqt/wheel_control_speed_steer_path_follower_1.perspective" />
+  <node name="rqt2" pkg="rqt_gui" type="rqt_gui" args="--perspective-file $(find mobile_manipulator_body)/rqt/wheel_control_speed_steer_path_follower_2.perspective" />
+
+  <!-- In the end, my node -->
+  <node name="wheel_control_speed_steer_path_follower_lidar" pkg="mobile_manipulator_body" type="wheel_control_speed_steer_path_follower_lidar.py" output="screen"/>
+
+</launch>
